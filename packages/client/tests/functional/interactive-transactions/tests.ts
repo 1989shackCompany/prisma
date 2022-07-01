@@ -397,10 +397,12 @@ testMatrix.setupTestSuite(({ provider }) => {
 
   /**
    * Makes sure that the engine does not deadlock
+   * For sqlite, it sometimes causes DB lock up and all subsequent
+   * tests fail. We might want to re-enable it either after we implemented
+   * WAL mode (https://github.com/prisma/prisma/issues/3303) or identified the
+   * issue on our side
    */
-  test('high concurrency', async () => {
-    jest.setTimeout(30_000)
-
+  testIf(provider !== 'sqlite')('high concurrency', async () => {
     await prisma.user.create({
       data: {
         email: 'x',
